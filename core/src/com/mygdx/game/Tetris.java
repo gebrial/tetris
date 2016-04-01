@@ -9,13 +9,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import java.util.Iterator;
 
-public class Tetris extends Game implements Iterable<Square>{
+public class Tetris extends Game implements Iterable<Block>{
 	SpriteBatch batch;
 	BitmapFont font;
 	ShapeRenderer shapeRenderer;
 
-	private Array<Square> squares;
-	private Piece piece;
+	private Array<Block> blocks; // cemented blocks
+	private Piece piece; // movable blocks
 	private long lastMoved; // in nanoseconds
 	private long moveTime; // in nanoseconds
 	private int rows;
@@ -51,7 +51,7 @@ public class Tetris extends Game implements Iterable<Square>{
 		font = new BitmapFont();
 		shapeRenderer = new ShapeRenderer();
 
-		squares = new Array<Square>(false, 128);
+		blocks = new Array<Block>(false, 128);
 		rows = 16;
 		columns = 8;
 
@@ -98,15 +98,15 @@ public class Tetris extends Game implements Iterable<Square>{
 
 		lastMoved = TimeUtils.nanoTime();
 		if(!piece.moveDown()){
-			squares.addAll(piece.squares);
+			blocks.addAll(piece.blocks);
 			clearRows();
 			piece = new Piece(this);
 		}
 	}
 
 	/*
-	 * Clears any rows on board filled with squares.
-	 * Move all squares above removed rows down.
+	 * Clears any rows on board filled with blocks.
+	 * Move all blocks above removed rows down.
 	 */
 	private void clearRows(){
 		int[] rowSquares = new int[rows];
@@ -114,19 +114,19 @@ public class Tetris extends Game implements Iterable<Square>{
 		for(int row = 0; row < rows; row++)
 			rowSquares[row] = 0;
 
-		for(Square square : squares)
-			rowSquares[square.getRow()]++;
+		for(Block block : blocks)
+			rowSquares[block.getRow()]++;
 
 		for(int row = 0; row < rows; row++){ // check every row
 			if(rowSquares[row] == columns){
 				// if row full, remove any square that is in that row
-				Iterator<Square> iter = squares.iterator();
+				Iterator<Block> iter = blocks.iterator();
 				while(iter.hasNext()){
-					Square square = iter.next();
-					if(square.getRow() == row)
+					Block block = iter.next();
+					if(block.getRow() == row)
 						iter.remove();
-					else if(square.getRow() > row)
-						square.moveDown();
+					else if(block.getRow() > row)
+						block.moveDown();
 				}
 
 				// lower row values from rows above
@@ -139,6 +139,26 @@ public class Tetris extends Game implements Iterable<Square>{
 		}
 	}
 
+	/*
+	 * @return	True if there is a block on the space specified by column and row that is not part of movable piece.
+	 * 			False otherwise
+	 */
+	public boolean occupiedNotPiece(int column, int row){
+		for(Block b : blocks)
+			if(b.getColumn() == column && b.getRow() == row)
+				return true;
+
+		return false;
+	}
+
+	public boolean rotatePieceCW(){
+		return piece.rotateCW();
+	}
+
+	public boolean rotatePieceCCW(){
+		return piece.rotateCCW();
+	}
+
 	/**
 	 * Returns an iterator over elements of type {@code T}.
 	 *
@@ -146,6 +166,6 @@ public class Tetris extends Game implements Iterable<Square>{
 	 */
 	@Override
 	public Iterator iterator() {
-		return squares.iterator();
+		return blocks.iterator();
 	}
 }

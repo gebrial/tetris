@@ -39,6 +39,16 @@ public class GameScreen implements Screen {
         if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
             game.getPiece().moveDown();
         }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+            boolean rot = game.rotatePieceCCW();
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+            boolean rot = game.rotatePieceCW();
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+            Gdx.app.exit();
+        }
+
 
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -46,20 +56,14 @@ public class GameScreen implements Screen {
         camera.update();
         game.update();
 
-/*
-        game.batch.setProjectionMatrix(camera.combined);
-        game.batch.begin();
-        game.font.draw(game.batch, "This is Tetris", 400, 250);
-        game.batch.end();
-*/
 
         game.shapeRenderer.setProjectionMatrix(camera.combined);
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         game.shapeRenderer.setColor(Color.RED);
-        for(Square square : game)
-            game.shapeRenderer.box(square.getColumn()*40, square.getRow()*40, 0, 40, 40, 0);
-        for(Square square : game.getPiece())
-            game.shapeRenderer.box(square.getColumn()*40, square.getRow()*40, 0, 40, 40, 0);
+        for(Block block : game)
+            game.shapeRenderer.box(block.getColumn()*40, block.getRow()*40, 0, 40, 40, 0);
+        for(Block block : game.getPiece())
+            game.shapeRenderer.box(block.getColumn()*40, block.getRow()*40, 0, 40, 40, 0);
         game.shapeRenderer.end();
     }
 
