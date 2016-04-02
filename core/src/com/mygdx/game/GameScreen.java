@@ -17,7 +17,7 @@ public class GameScreen implements Screen {
 
     public GameScreen(Tetris tetris){
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 800);
+        camera.setToOrtho(false, 600, 1200);
 
         game = tetris;
         game.start();
@@ -57,13 +57,25 @@ public class GameScreen implements Screen {
         game.update();
 
 
+        int size = 60;
         game.shapeRenderer.setProjectionMatrix(camera.combined);
+        Color current = null;
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        game.shapeRenderer.setColor(Color.RED);
-        for(Block block : game)
-            game.shapeRenderer.box(block.getColumn()*40, block.getRow()*40, 0, 40, 40, 0);
+        for(Block block : game) {
+            if (!block.getColor().equals(current)) {
+                current = block.getColor();
+                game.shapeRenderer.end();
+                game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+                game.shapeRenderer.setColor(current);
+            }
+            game.shapeRenderer.box(block.getColumn() * size, block.getRow() * size, 0, size, size, 0);
+        }
+        game.shapeRenderer.end();
+
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        game.shapeRenderer.setColor(game.getPiece().getColor());
         for(Block block : game.getPiece())
-            game.shapeRenderer.box(block.getColumn()*40, block.getRow()*40, 0, 40, 40, 0);
+            game.shapeRenderer.box(block.getColumn()*size, block.getRow()*size, 0, size, size, 0);
         game.shapeRenderer.end();
     }
 

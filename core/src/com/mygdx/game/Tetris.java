@@ -51,9 +51,9 @@ public class Tetris extends Game implements Iterable<Block>{
 		font = new BitmapFont();
 		shapeRenderer = new ShapeRenderer();
 
-		blocks = new Array<Block>(false, 128);
-		rows = 16;
-		columns = 8;
+		rows = 20;
+		columns = 10;
+		blocks = new Array<Block>(true, rows*columns);
 
 		lastMoved = TimeUtils.nanoTime();
 		moveTime = 1000000000; // 1billion nanoseconds = 1 second
@@ -100,6 +100,7 @@ public class Tetris extends Game implements Iterable<Block>{
 		if(!piece.moveDown()){
 			blocks.addAll(piece.blocks);
 			clearRows();
+			blocks.sort();
 			piece = new Piece(this);
 		}
 	}
