@@ -19,11 +19,17 @@ public class Tetris extends Game implements Iterable<Block>{
 	private Array<Block> blocks; // cemented blocks
 	private Piece piece; // movable blocks
 	private long lastMoved; // in nanoseconds
+	private long pausedTime; // in nanoseconds
 	private long moveTime; // in nanoseconds
 	private int rows;
 	private int columns;
 	private int score;
 	private boolean fourRowsCleared;
+	private boolean paused;
+
+	public boolean isPaused(){
+		return paused;
+	}
 
 	public int getColumns() {
 		return columns;
@@ -89,11 +95,22 @@ public class Tetris extends Game implements Iterable<Block>{
 	 * Call update before rendering.
 	 */
 	public void start(){
+		paused = false;
 		score = 0;
 		fourRowsCleared = false;
 		piece = new Piece(this);
 		lastMoved = TimeUtils.nanoTime();
 		blocks.clear();
+	}
+
+	public void pause(){
+		paused = true;
+		pausedTime = TimeUtils.nanoTime();
+	}
+
+	public void resume(){
+		paused = false;
+		lastMoved += TimeUtils.timeSinceNanos(pausedTime);
 	}
 
 	/*

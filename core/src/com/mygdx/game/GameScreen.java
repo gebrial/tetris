@@ -35,6 +35,9 @@ public class GameScreen implements Screen {
             @Override
             public void onUp() {
                 // TODO Auto-generated method stub
+                if(game.isPaused())
+                    return;
+
                 int pos = Gdx.input.getX();
                 if(pos < width/2)
                     game.getPiece().rotateCW();
@@ -45,18 +48,27 @@ public class GameScreen implements Screen {
             @Override
             public void onRight() {
                 // TODO Auto-generated method stub
+                if(game.isPaused())
+                    return;
+
                 game.getPiece().moveRight();
             }
 
             @Override
             public void onLeft() {
                 // TODO Auto-generated method stub
+                if(game.isPaused())
+                    return;
+
                 game.getPiece().moveLeft();
             }
 
             @Override
             public void onDown() {
                 // TODO Auto-generated method stub
+                if(game.isPaused())
+                    return;
+
                 game.getPiece().moveDown();
             }
         }));
@@ -69,33 +81,42 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
-            game.getPiece().moveLeft();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
-            game.getPiece().moveRight();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-            game.getPiece().moveDown();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            game.rotatePieceCCW();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            game.rotatePieceCW();
-        }
-        if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            Gdx.app.exit();
-        }
-
+        if(!game.isPaused()) {
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT)) {
+                game.getPiece().moveLeft();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                game.getPiece().moveRight();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+                game.getPiece().moveDown();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
+                game.rotatePieceCCW();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.D)) {
+                game.rotatePieceCW();
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+                Gdx.app.exit();
+            }
+            if (Gdx.input.isTouched()
+                    || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+                game.pause();
+            }
+        } else
+            if (Gdx.input.isTouched()
+                    || Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+                game.resume();
 
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
-        game.update();
+        if(!game.isPaused())
+            game.update();
 
-
+        // drawing
         int size = 60;
         game.shapeRenderer.setProjectionMatrix(camera.combined);
         Color current = null;
@@ -121,7 +142,6 @@ public class GameScreen implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, Integer.toString(game.getScore()), 10, height - 10);
         game.batch.end();
-
     }
 
     @Override
