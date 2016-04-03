@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 public class GameScreen implements Screen {
     private final Tetris game;
     private OrthographicCamera camera;
+    private int height, width;
 
     public GameScreen(Tetris tetris){
         camera = new OrthographicCamera();
@@ -21,6 +22,9 @@ public class GameScreen implements Screen {
 
         game = tetris;
         game.start();
+
+        height = Gdx.graphics.getHeight();
+        width = Gdx.graphics.getWidth();
     }
 
     @Override
@@ -77,11 +81,18 @@ public class GameScreen implements Screen {
         for(Block block : game.getPiece())
             game.shapeRenderer.box(block.getColumn()*size, block.getRow()*size, 0, size, size, 0);
         game.shapeRenderer.end();
+
+        game.batch.setProjectionMatrix(camera.combined);
+        game.batch.begin();
+        game.font.draw(game.batch, Integer.toString(game.getScore()), 10, height - 10);
+        game.batch.end();
+
     }
 
     @Override
     public void resize(int width, int height) {
-
+        this.width = width;
+        this.height = height;
     }
 
     @Override

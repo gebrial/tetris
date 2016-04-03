@@ -20,6 +20,8 @@ public class Tetris extends Game implements Iterable<Block>{
 	private long moveTime; // in nanoseconds
 	private int rows;
 	private int columns;
+	private int score;
+	private boolean fourRowsCleared;
 
 	public int getColumns() {
 		return columns;
@@ -54,6 +56,9 @@ public class Tetris extends Game implements Iterable<Block>{
 		rows = 20;
 		columns = 10;
 		blocks = new Array<Block>(true, rows*columns);
+
+		score = 0;
+		fourRowsCleared = false;
 
 		lastMoved = TimeUtils.nanoTime();
 		moveTime = 1000000000; // 1billion nanoseconds = 1 second
@@ -97,9 +102,22 @@ public class Tetris extends Game implements Iterable<Block>{
 		}
 
 		lastMoved = TimeUtils.nanoTime();
+
+		// Only true when piece hits bottom and new piece spawns
+		// must also clear full rows now
 		if(!piece.moveDown()){
 			blocks.addAll(piece.blocks);
-			clearRows();
+
+			int rowsCleared = clearRows();
+			score += rowsCleared*100;
+			if(rowsCleared == 4) {
+				score += 400;
+				if(fourRowsCleared)
+					score += 400;
+				fourRowsCleared = true;
+			} else
+				fourRowsCleared = false;
+
 			blocks.sort();
 			piece = new Piece(this);
 		}
@@ -109,7 +127,8 @@ public class Tetris extends Game implements Iterable<Block>{
 	 * Clears any rows on board filled with blocks.
 	 * Move all blocks above removed rows down.
 	 */
-	private void clearRows(){
+	private int clearRows(){
+		int rowsCleared = 0;
 		int[] rowSquares = new int[rows];
 
 		for(int row = 0; row < rows; row++)
@@ -120,6 +139,7 @@ public class Tetris extends Game implements Iterable<Block>{
 
 		for(int row = 0; row < rows; row++){ // check every row
 			if(rowSquares[row] == columns){
+				rowsCleared++;
 				// if row full, remove any square that is in that row
 				Iterator<Block> iter = blocks.iterator();
 				while(iter.hasNext()){
@@ -138,6 +158,8 @@ public class Tetris extends Game implements Iterable<Block>{
 				row--; // check this row again since we have moved everything down
 			}
 		}
+
+		return rowsCleared;
 	}
 
 	/*
@@ -168,5 +190,9 @@ public class Tetris extends Game implements Iterable<Block>{
 	@Override
 	public Iterator iterator() {
 		return blocks.iterator();
+	}
+
+	public int getScore() {
+		return score;
 	}
 }

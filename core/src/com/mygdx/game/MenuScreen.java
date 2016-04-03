@@ -16,7 +16,7 @@ public class MenuScreen implements Screen {
         game = tetris;
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 480, 800);
+        camera.setToOrtho(false, 600, 1200);
     }
 
     @Override
