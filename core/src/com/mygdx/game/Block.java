@@ -106,7 +106,7 @@ class Block implements Comparable<Block>{
     public Vector2 rotateCWLocation(Vector2 pivot){
         return new Vector2(pivot)
                 .sub((float) column, (float) row)
-                .rotate90(-1)
+                .rotate90(1)
                 .add(pivot);
     }
 
@@ -125,7 +125,7 @@ class Block implements Comparable<Block>{
     public Vector2 rotateCCWLocation(Vector2 pivot){
         return new Vector2(pivot)
                 .sub((float) column, (float) row)
-                .rotate90(1)
+                .rotate90(-1)
                 .add(pivot);
     }
 

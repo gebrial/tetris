@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Created by sanjaya on 29/03/16.
@@ -28,6 +29,37 @@ public class GameScreen implements Screen {
 
         height = Gdx.graphics.getHeight();
         width = Gdx.graphics.getWidth();
+
+        Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
+
+            @Override
+            public void onUp() {
+                // TODO Auto-generated method stub
+                int pos = Gdx.input.getX();
+                if(pos < width/2)
+                    game.getPiece().rotateCW();
+                else
+                    game.getPiece().rotateCCW();
+            }
+
+            @Override
+            public void onRight() {
+                // TODO Auto-generated method stub
+                game.getPiece().moveRight();
+            }
+
+            @Override
+            public void onLeft() {
+                // TODO Auto-generated method stub
+                game.getPiece().moveLeft();
+            }
+
+            @Override
+            public void onDown() {
+                // TODO Auto-generated method stub
+                game.getPiece().moveDown();
+            }
+        }));
     }
 
     @Override
@@ -47,10 +79,10 @@ public class GameScreen implements Screen {
             game.getPiece().moveDown();
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.A)) {
-            boolean rot = game.rotatePieceCCW();
+            game.rotatePieceCCW();
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.D)) {
-            boolean rot = game.rotatePieceCW();
+            game.rotatePieceCW();
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             Gdx.app.exit();
