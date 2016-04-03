@@ -17,8 +17,11 @@ public class GameScreen implements Screen {
     private int height, width;
 
     public GameScreen(Tetris tetris){
+        width = Gdx.graphics.getWidth();
+        height = Gdx.graphics.getHeight();
+
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 600, 1200);
+        camera.setToOrtho(false, width, height);
 
         game = tetris;
         game.start();
@@ -72,14 +75,14 @@ public class GameScreen implements Screen {
                 game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
                 game.shapeRenderer.setColor(current);
             }
-            game.shapeRenderer.box(block.getColumn() * size, block.getRow() * size, 0, size, size, 0);
+            game.shapeRenderer.box(block.getColumn() * size + 1, block.getRow() * size + 1, 0, size - 1, size - 1, 0);
         }
         game.shapeRenderer.end();
 
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         game.shapeRenderer.setColor(game.getPiece().getColor());
         for(Block block : game.getPiece())
-            game.shapeRenderer.box(block.getColumn()*size, block.getRow()*size, 0, size, size, 0);
+            game.shapeRenderer.box(block.getColumn()*size + 1, block.getRow()*size + 1, 0, size - 1, size - 1, 0);
         game.shapeRenderer.end();
 
         game.batch.setProjectionMatrix(camera.combined);
@@ -93,6 +96,7 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
+        camera.setToOrtho(false, width, height);
     }
 
     @Override

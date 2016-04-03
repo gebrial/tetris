@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -87,8 +88,11 @@ public class Tetris extends Game implements Iterable<Block>{
 	 * Call update before rendering.
 	 */
 	public void start(){
+		score = 0;
+		fourRowsCleared = false;
 		piece = new Piece(this);
 		lastMoved = TimeUtils.nanoTime();
+		blocks.clear();
 	}
 
 	/*
@@ -120,6 +124,13 @@ public class Tetris extends Game implements Iterable<Block>{
 
 			blocks.sort();
 			piece = new Piece(this);
+			for(Block p : piece)
+				for(Block b : blocks)
+					if(p.overlaps(b)){
+						Screen game = getScreen();
+						setScreen(new LossScreen(this));
+						game.dispose();
+					}
 		}
 	}
 

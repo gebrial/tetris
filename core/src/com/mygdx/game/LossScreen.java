@@ -7,19 +7,18 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
- * Created by sanjaya on 29/03/16.
+ * Created by Stephen on 4/2/2016.
  */
-public class MenuScreen implements Screen {
+public class LossScreen implements Screen {
     final Tetris game;
-    private int width, height;
     OrthographicCamera camera;
+    int width, height;
 
-    public MenuScreen(Tetris tetris){
-        game = tetris;
-
+    public LossScreen(Tetris t){
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
 
+        game = t;
         camera = new OrthographicCamera();
         camera.setToOrtho(false, width, height);
     }
@@ -38,8 +37,9 @@ public class MenuScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Tetris", width/2, height/2);
-        game.font.draw(game.batch, "Tap anywhere to begin", width/2, height/2 - 15);
+        game.font.draw(game.batch, "Game Over", width/2, height/2);
+        game.font.draw(game.batch, "Score: " + Integer.toString(game.getScore()), width/2, height/2 - 15);
+        game.font.draw(game.batch, "Tap anywhere to play again!", width/2, height/2 - 30);
         game.batch.end();
         if(Gdx.input.isKeyPressed(Input.Keys.N)
                 || Gdx.input.isTouched()){
