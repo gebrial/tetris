@@ -17,6 +17,7 @@ public class GameScreen implements Screen {
     private OrthographicCamera camera;
     private int height, width;
     private int viewBlockSize, cameraBlockSize;
+    private boolean isWide; // default is false
 
     public GameScreen(Tetris tetris){
         width = Gdx.graphics.getWidth();
@@ -30,10 +31,31 @@ public class GameScreen implements Screen {
         height = Gdx.graphics.getHeight();
         width = Gdx.graphics.getWidth();
 
-        viewBlockSize = height*12 < width*25 ? height/25: width/12;
+        //viewBlockSize = height*12 < width*25 ? height/25: width/12;
+
+        isWide = height*17 < width*22;
+        viewBlockSize = calculateBlockSize();
+
         cameraBlockSize = 60;
 
         setupInputProcessor();
+    }
+
+    /*
+     * See game_screen_layout.png for details on layout
+     * class variable isWide must be set properly before calling this function
+     * @return  block size for view depending on size of screen
+     */
+    private int calculateBlockSize(){
+        int size;
+
+        if(isWide)
+            size = height/22;
+        else {
+            //size = width / 12; // since tall is the default view, a doubly variable size value is needed:
+            size = height*12 < width*25 ? height/25: width/12;
+        }
+        return size;
     }
 
     /*
@@ -88,9 +110,15 @@ public class GameScreen implements Screen {
         if(!game.isPaused())
             game.update();
 
-        drawBoard();
-        drawNextPiece();
-        drawScore();
+        if(isWide) { // wide
+            drawBoard(viewBlockSize , viewBlockSize);
+            drawNextPiece(width - 5 * viewBlockSize, height - 3 * viewBlockSize);
+            drawScore(width - 5 * viewBlockSize, height - 4 * viewBlockSize);
+        } else { // default, tall
+            drawBoard(width / 2 - viewBlockSize * 5, viewBlockSize);
+            drawNextPiece(width - 5 * viewBlockSize, height - 3 * viewBlockSize);
+            drawScore(viewBlockSize, height - 2 * viewBlockSize);
+        }
     }
 
     /*
@@ -126,26 +154,26 @@ public class GameScreen implements Screen {
             game.resume();
     }
 
-    private void drawScore() {
-        Gdx.gl.glViewport(viewBlockSize, height - 2*viewBlockSize,
+    private void drawScore(int x, int y) {
+        Gdx.gl.glViewport(x, y,
                 viewBlockSize*5, viewBlockSize);
 
         // print score
         camera.setToOrtho(false, viewBlockSize*5, viewBlockSize);
         game.batch.setProjectionMatrix(camera.combined);
         game.batch.begin();
-        game.font.draw(game.batch, Integer.toString(game.getScore()), 0, viewBlockSize);
+        game.font.draw(game.batch, Integer.toString(game.getScore()), 0, viewBlockSize/2);
         game.batch.end();
     }
 
-    private void drawNextPiece(){
-        Gdx.gl.glViewport(width - 5*viewBlockSize, height - 3*viewBlockSize,
+    private void drawNextPiece(int x, int y){
+        Gdx.gl.glViewport(x, y,
                 viewBlockSize*4, viewBlockSize*2);
 
         int size = cameraBlockSize;
-        camera.setToOrtho(false, size*4, size*2);
 
         // draw next piece
+        camera.setToOrtho(false, size*4, size*2);
         game.shapeRenderer.setProjectionMatrix(camera.combined);
         game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
         game.shapeRenderer.setColor(game.getNextPiece().getColor());
@@ -157,11 +185,12 @@ public class GameScreen implements Screen {
     }
 
     /*
-     * Draw everything on screen
+     * Draw cemented blocks and movable piece on board.
+     * @parameter x, y      bottom left location of board
      */
-    private void drawBoard(){
+    private void drawBoard(int x, int y){
 
-        Gdx.gl.glViewport(width/2 - viewBlockSize*5, viewBlockSize,
+        Gdx.gl.glViewport(x, y,
                 viewBlockSize*10, viewBlockSize*20);
 
         int size = cameraBlockSize;
@@ -194,7 +223,9 @@ public class GameScreen implements Screen {
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
-        viewBlockSize = height*12 < width*25 ? height/25: width/12;
+        //viewBlockSize = height*12 < width*25 ? height/25: width/12;
+        isWide = width*22 > height*17;
+        viewBlockSize = calculateBlockSize();
     }
 
     @Override
