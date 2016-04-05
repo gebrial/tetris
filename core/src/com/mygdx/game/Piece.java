@@ -94,12 +94,11 @@ public class Piece implements Iterable<Block>{
         int xPivot = floor(game.getColumns()/2);
         int yPivot = game.getRows() - 2;
 
-        blocks.add(new Block(game, xPivot, yPivot, c));
-        blocks.add(new Block(game, xPivot, yPivot + 1, c));
-
         int offset = Ess ? 1 : 0;
         blocks.add(new Block(game, xPivot + 1, yPivot + 1 - offset, c));
         blocks.add(new Block(game, xPivot - 1, yPivot + offset, c));
+        blocks.add(new Block(game, xPivot, yPivot, c));
+        blocks.add(new Block(game, xPivot, yPivot + 1, c));
 
         pivot = new Vector2(xPivot, yPivot);
     }
@@ -134,10 +133,10 @@ public class Piece implements Iterable<Block>{
         color = c;
 
         int xPivot = floor(game.getColumns()/2);
-        int yPivot = game.getRows() - 1;
+        int yPivot = game.getRows() - 2;
 
-        int offset = Ell ? 1: -1;
-        blocks.add(new Block(game, xPivot + offset, yPivot - 1, c));
+        int offset = Ell ? -1: 1;
+        blocks.add(new Block(game, xPivot + offset, yPivot + 1, c));
         blocks.add(new Block(game, xPivot, yPivot, c));
         blocks.add(new Block(game, xPivot + 1, yPivot, c));
         blocks.add(new Block(game, xPivot - 1, yPivot, c));
@@ -158,6 +157,10 @@ public class Piece implements Iterable<Block>{
         float xPivot = (float) (floor(game.getColumns()/2) + 1./2.);
         float yPivot = (float) (game.getRows() - 3./2.);
         pivot = new Vector2(xPivot, yPivot);
+    }
+
+    public Vector2 getPivot() {
+        return pivot;
     }
 
     /*

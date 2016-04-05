@@ -18,6 +18,7 @@ public class Tetris extends Game implements Iterable<Block>{
 
 	private Array<Block> blocks; // cemented blocks
 	private Piece piece; // movable blocks
+	private Piece nextPiece;
 	private long lastMoved; // in nanoseconds
 	private long pausedTime; // in nanoseconds
 	private long moveTime; // in nanoseconds
@@ -49,6 +50,10 @@ public class Tetris extends Game implements Iterable<Block>{
 
 	public Piece getPiece() {
 		return piece;
+	}
+
+	public Piece getNextPiece() {
+		return nextPiece;
 	}
 
 	public void setPiece(Piece piece) {
@@ -99,6 +104,7 @@ public class Tetris extends Game implements Iterable<Block>{
 		score = 0;
 		fourRowsCleared = false;
 		piece = new Piece(this);
+		nextPiece = new Piece(this);
 		lastMoved = TimeUtils.nanoTime();
 		blocks.clear();
 	}
@@ -141,7 +147,8 @@ public class Tetris extends Game implements Iterable<Block>{
 				fourRowsCleared = false;
 
 			blocks.sort();
-			piece = new Piece(this);
+			piece = nextPiece;
+			nextPiece = new Piece(this);
 			for(Block p : piece)
 				for(Block b : blocks)
 					if(p.overlaps(b)){

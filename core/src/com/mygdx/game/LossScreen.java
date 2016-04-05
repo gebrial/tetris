@@ -33,6 +33,9 @@ public class LossScreen implements Screen {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        Gdx.gl.glViewport(0, 0,
+                width, height);
+
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
 
