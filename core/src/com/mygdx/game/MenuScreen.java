@@ -1,27 +1,99 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+
+import java.util.Iterator;
 
 /**
  * Created by sanjaya on 29/03/16.
  */
 public class MenuScreen implements Screen {
     final Tetris game;
-    private int width, height;
-    OrthographicCamera camera;
+
+    Stage stage;
+    Skin skin;
+
+    Array<Button> buttons;
 
     public MenuScreen(Tetris tetris){
         game = tetris;
 
-        width = Gdx.graphics.getWidth();
-        height = Gdx.graphics.getHeight();
+        int width = 320;
+        int height = 480;
+        int singleSizeWidth = width/5;
+        int singleSizeHeight = height/31;
 
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, width, height);
+        buttons = new Array<Button>(true, 4);
+
+        stage = new Stage();
+        stage.setViewport(new ExtendViewport(width, height, new OrthographicCamera()));
+        Gdx.input.setInputProcessor(stage);
+
+        // set up button texture/resource
+        skin = new Skin();
+        Pixmap pixmap = new Pixmap(singleSizeWidth*3, singleSizeHeight*3, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.GREEN);
+        pixmap.fill();
+        skin.add("white", new Texture(pixmap));
+        skin.add("default", game.font);
+
+        // style options for buttons
+        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
+        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
+        textButtonStyle.checked = skin.newDrawable("white", Color.BLUE);
+        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
+        textButtonStyle.font = skin.getFont("default");
+
+        // add styles to button skin
+        skin.add("default", textButtonStyle);
+
+        // Create/Add buttons to stage
+        final TextButton playButton = new TextButton("PLAY", textButtonStyle);
+        playButton.setPosition(singleSizeWidth, singleSizeHeight*14);
+        stage.addActor(playButton);
+        buttons.add(playButton);
+        playButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new GameScreen(game));
+                dispose();
+            }
+        });
+
+        final TextButton optionsButton = new TextButton("OPTIONS", textButtonStyle);
+        optionsButton.setPosition(singleSizeWidth, singleSizeHeight*10);
+        stage.addActor(optionsButton);
+        buttons.add(optionsButton);
+
+        final TextButton scoresButton = new TextButton("SCORES", textButtonStyle);
+        scoresButton.setPosition(singleSizeWidth, singleSizeHeight*6);
+        stage.addActor(scoresButton);
+        buttons.add(scoresButton);
+
+        final TextButton exitButton = new TextButton("EXIT", textButtonStyle);
+        exitButton.setPosition(singleSizeWidth, singleSizeHeight*2);
+        stage.addActor(exitButton);
+        buttons.add(exitButton);
+        exitButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.exit();
+            }
+        });
     }
 
     @Override
@@ -33,31 +105,13 @@ public class MenuScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0.2f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        Gdx.gl.glViewport(0, 0,
-                width, height);
-
-        camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
-
-        game.batch.begin();
-        game.font.draw(game.batch, "Welcome to Tetris", width/2, height/2);
-        game.font.draw(game.batch, "Tap anywhere to begin", width/2, height/2 - 15);
-        game.batch.end();
-        if(Gdx.input.isKeyPressed(Input.Keys.N)
-                || Gdx.input.isTouched()){
-            game.setScreen(new GameScreen(game));
-            dispose();
-        }
-        if(Gdx.input.isKeyPressed(Input.Keys.Q))
-            Gdx.app.exit();
+        stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+        stage.draw();
     }
 
     @Override
     public void resize(int width, int height) {
-        this.width = width;
-        this.height = height;
-        camera.setToOrtho(false, width, height);
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -77,6 +131,7 @@ public class MenuScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        stage.dispose();
+        skin.dispose();
     }
 }
