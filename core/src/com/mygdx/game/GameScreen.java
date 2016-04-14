@@ -103,7 +103,7 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         checkInput();
 
-        Gdx.gl.glClearColor(0, 0, 0.2f, 1);
+        Gdx.gl.glClearColor(0, 0, 0.1f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         camera.update();
@@ -196,6 +196,20 @@ public class GameScreen implements Screen {
         int size = cameraBlockSize;
         camera.setToOrtho(false, size*10, size*20);
         game.shapeRenderer.setProjectionMatrix(camera.combined);
+
+        // draw board background
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
+        Color lighterBG = Color.NAVY;
+        game.shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        game.shapeRenderer.setColor(lighterBG);
+        for(int i = 0; i < game.getRows(); i++){
+            for(int j = i & 1; j < game.getColumns(); j += 2) {
+                game.shapeRenderer.box(j * size, i * size, 0, size, size , 0);
+            }
+        }
+        game.shapeRenderer.end();
 
         // draw blocks
         Color current = null;
