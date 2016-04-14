@@ -42,11 +42,11 @@ public class LossScreen implements Screen {
         game.batch.begin();
         game.font.draw(game.batch, "Game Over", width/2, height/2);
         game.font.draw(game.batch, "Score: " + Integer.toString(game.getScore()), width/2, height/2 - 15);
-        game.font.draw(game.batch, "Tap anywhere to play again!", width/2, height/2 - 30);
+        game.font.draw(game.batch, "High Score: " + Integer.toString(game.getHighScore()), width/2, height/2 - 30);
         game.batch.end();
-        if(Gdx.input.isKeyPressed(Input.Keys.N)
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)
                 || Gdx.input.isTouched()){
-            game.setScreen(new GameScreen(game));
+            game.setScreen(new MenuScreen(game));
             dispose();
         }
         if(Gdx.input.isKeyPressed(Input.Keys.Q))

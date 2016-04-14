@@ -3,19 +3,16 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
-import java.util.Iterator;
 
 /**
  * Created by sanjaya on 29/03/16.
@@ -48,7 +45,7 @@ public class MenuScreen implements Screen {
         pixmap.setColor(Color.GREEN);
         pixmap.fill();
         skin.add("white", new Texture(pixmap));
-        skin.add("default", game.font);
+        skin.add("default", new BitmapFont());
 
         // style options for buttons
         TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
@@ -83,6 +80,13 @@ public class MenuScreen implements Screen {
         scoresButton.setPosition(singleSizeWidth, singleSizeHeight*6);
         stage.addActor(scoresButton);
         buttons.add(scoresButton);
+        scoresButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new ScoreScreen(game));
+                dispose();
+            }
+        });
 
         final TextButton exitButton = new TextButton("EXIT", textButtonStyle);
         exitButton.setPosition(singleSizeWidth, singleSizeHeight*2);

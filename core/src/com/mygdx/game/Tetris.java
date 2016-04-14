@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -15,6 +16,7 @@ public class Tetris extends Game implements Iterable<Block>{
 	SpriteBatch batch;
 	BitmapFont font;
 	ShapeRenderer shapeRenderer;
+	Preferences prefs;
 
 	private Array<Block> blocks; // cemented blocks
 	private Piece piece; // movable blocks
@@ -65,6 +67,12 @@ public class Tetris extends Game implements Iterable<Block>{
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		shapeRenderer = new ShapeRenderer();
+
+		prefs = Gdx.app.getPreferences("scores");
+		for(int i = 0; i < 10; i++)
+			if(!prefs.contains("highScore" + i))
+				prefs.putInteger("highScore" + i, 0);
+		prefs.flush();
 
 		rows = 20;
 		columns = 10;
@@ -152,9 +160,11 @@ public class Tetris extends Game implements Iterable<Block>{
 			for(Block p : piece)
 				for(Block b : blocks)
 					if(p.overlaps(b)){
+						setHighScore();
 						Screen game = getScreen();
 						setScreen(new LossScreen(this));
 						game.dispose();
+						return;
 					}
 		}
 	}
@@ -230,5 +240,41 @@ public class Tetris extends Game implements Iterable<Block>{
 
 	public int getScore() {
 		return score;
+	}
+
+	public int getHighScore(){
+		return getHighScore(0);
+	}
+
+	/*
+	 * gets the i'th high score
+	 * @param i		integer greater than or equal to 0
+	 */
+	public int getHighScore(int i){
+		return prefs.getInteger("highScore" + i);
+	}
+
+	/*
+	 * updates high score stats with current score
+	 */
+	private void setHighScore(){
+		// if current score less than lowest score on high scores table, do nothing
+		if(getScore() < prefs.getInteger("highScore" + 9))
+			return;
+
+		for(int i = 9; i > 0; i--){
+			// copy (i-1)'th score to i'th score
+			prefs.putInteger("highScore" + i, prefs.getInteger("highScore" + (i-1)));
+			if(getScore() < prefs.getInteger("highScore" + i)) {
+				// if current score less than (i-1)'th score
+				// set i'th score to current score
+				prefs.putInteger("highScore" + i, getScore());
+				prefs.flush();
+				return;
+			}
+		}
+
+		prefs.putInteger("highScore0", getScore());
+		prefs.flush();
 	}
 }
