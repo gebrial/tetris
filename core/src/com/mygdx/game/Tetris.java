@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -24,10 +25,12 @@ public class Tetris extends Game implements Iterable<Block>{
 	private long lastMoved; // in nanoseconds
 	private long pausedTime; // in nanoseconds
 	private long moveTime; // in nanoseconds
+	private static long defaultMoveTime = 1000000000; // in nano seconds
 	private int rows;
 	private int columns;
 	private int score;
 	private boolean fourRowsCleared;
+	private int totalRowsCleared;
 	private boolean paused;
 
 	public boolean isPaused(){
@@ -78,12 +81,6 @@ public class Tetris extends Game implements Iterable<Block>{
 		columns = 10;
 		blocks = new Array<Block>(true, rows*columns);
 
-		score = 0;
-		fourRowsCleared = false;
-
-		lastMoved = TimeUtils.nanoTime();
-		moveTime = 1000000000; // 1billion nanoseconds = 1 second
-
 		this.setScreen(new MenuScreen(this));
 
 //		Gdx.graphics.setContinuousRendering(false);
@@ -115,6 +112,8 @@ public class Tetris extends Game implements Iterable<Block>{
 		nextPiece = new Piece(this);
 		lastMoved = TimeUtils.nanoTime();
 		blocks.clear();
+		totalRowsCleared = 0;
+		moveTime = getMoveTime(totalRowsCleared);
 	}
 
 	/*
@@ -161,6 +160,9 @@ public class Tetris extends Game implements Iterable<Block>{
 			} else
 				fourRowsCleared = false;
 
+			totalRowsCleared += rowsCleared;
+			moveTime = getMoveTime(totalRowsCleared);
+
 			blocks.sort();
 			piece = nextPiece;
 			nextPiece = new Piece(this);
@@ -174,6 +176,12 @@ public class Tetris extends Game implements Iterable<Block>{
 						return;
 					}
 		}
+	}
+
+	private static long getMoveTime(int totalRowsCleared){
+		double moveTimeTemp = 1./MathUtils.log(10, 6*totalRowsCleared + 10);
+		moveTimeTemp *= defaultMoveTime;
+		return (long) moveTimeTemp;
 	}
 
 	/*
