@@ -117,6 +117,13 @@ public class Tetris extends Game implements Iterable<Block>{
 		blocks.clear();
 	}
 
+	/*
+	 * Finish the current game.
+	 */
+	public void finish(){
+		setHighScore();
+	}
+
 	public void pause(){
 		paused = true;
 		pausedTime = TimeUtils.nanoTime();
@@ -167,6 +174,13 @@ public class Tetris extends Game implements Iterable<Block>{
 						return;
 					}
 		}
+	}
+
+	/*
+	 * Resets the lastMoved time of the current piece to now.
+	 */
+	public void resetTimer(){
+		lastMoved = TimeUtils.nanoTime();
 	}
 
 	/*

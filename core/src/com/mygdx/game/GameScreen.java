@@ -133,7 +133,8 @@ public class GameScreen implements Screen {
                 game.getPiece().moveRight();
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
-                game.getPiece().moveDown();
+                if(game.getPiece().moveDown())
+                    game.resetTimer();
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.A)) {
                 game.rotatePieceCCW();
@@ -142,6 +143,7 @@ public class GameScreen implements Screen {
                 game.rotatePieceCW();
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
+                game.finish();
                 Gdx.app.exit();
             }
             if (//Gdx.input.isTouched() ||
