@@ -20,6 +20,8 @@ public class GameScreen implements Screen {
     private boolean isWide; // default is false
 
     public GameScreen(Tetris tetris){
+        Gdx.app.log("GameScreen", "attached");
+
         width = Gdx.graphics.getWidth();
         height = Gdx.graphics.getHeight();
 
@@ -96,7 +98,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-
+        Gdx.app.log("GameScreen", "show called");
     }
 
     @Override
@@ -237,6 +239,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        Gdx.app.log("GameScreen", "resizing");
+
         this.width = width;
         this.height = height;
         //viewBlockSize = height*12 < width*25 ? height/25: width/12;
@@ -246,17 +250,17 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-
+        Gdx.app.log("GameScreen", "pause called");
     }
 
     @Override
     public void resume() {
-
+        Gdx.app.log("GameScreen", "resume called");
     }
 
     @Override
     public void hide() {
-
+        Gdx.app.log("GameScreen", "hide called");
     }
 
     @Override

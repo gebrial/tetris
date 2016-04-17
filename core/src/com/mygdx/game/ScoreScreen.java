@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
 /**
- * Created by Stephen on 4/13/2016.
+ * Created by sanjaya on 4/13/2016.
  */
 public class ScoreScreen implements Screen {
     Tetris game;
@@ -67,7 +67,7 @@ public class ScoreScreen implements Screen {
         menuButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new MenuScreen(game));
+                game.setScreen(new MainScreen(game));
                 dispose();
             }
         });

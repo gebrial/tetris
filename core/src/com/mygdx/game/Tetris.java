@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,7 +18,7 @@ public class Tetris extends Game implements Iterable<Block>{
 	SpriteBatch batch;
 	BitmapFont font;
 	ShapeRenderer shapeRenderer;
-	Preferences prefs;
+	Preferences scores, options;
 
 	private Array<Block> blocks; // cemented blocks
 	private Piece piece; // movable blocks
@@ -32,56 +33,86 @@ public class Tetris extends Game implements Iterable<Block>{
 	private boolean fourRowsCleared;
 	private int totalRowsCleared;
 	private boolean paused;
+	private int garbageStart;
 
-	public boolean isPaused(){
+	// keys used for preferences
+	private static String garbageLines = "garbageLines";
+	private static String highScore = "highScore"; // each highScore key is succeeded by an int from 0 to 9, e.g., highScore + "3"
+
+	boolean isPaused(){
 		return paused;
 	}
 
-	public int getColumns() {
+	int getColumns() {
 		return columns;
 	}
 
-	public void setColumns(int columns) {
-		this.columns = columns;
-	}
-
-	public int getRows() {
+	int getRows() {
 		return rows;
 	}
 
-	public void setRows(int rows) {
-		this.rows = rows;
-	}
-
-	public Piece getPiece() {
+	Piece getPiece() {
 		return piece;
 	}
 
-	public Piece getNextPiece() {
+	Piece getNextPiece() {
 		return nextPiece;
 	}
 
-	public void setPiece(Piece piece) {
-		this.piece = piece;
+	/*
+	 * Initialize the value of the number of garbage lines from the options preferenes
+	 * or set it to zero if no such option has been created yet.
+	 */
+	void setGarbageStart(){
+		if(!options.contains(garbageLines))
+			setGarbageStart(0);
+		else
+			setGarbageStart(options.getInteger(garbageLines));
+	}
+
+	/*
+	 * Set the number of garbage lines to garbageStart
+	 * and change the value in the options preferences.
+	 */
+	void setGarbageStart(int garbageStart) {
+		if(garbageStart < 0)
+			this.garbageStart = 0;
+		else if(garbageStart > rows - 5)
+			this.garbageStart = rows - 5;
+		else
+			this.garbageStart = garbageStart;
+
+		options.putInteger(garbageLines, this.garbageStart);
+		options.flush();
+	}
+
+	int getGarbageStart() {
+		return garbageStart;
 	}
 
 	@Override
 	public void create () {
+		Gdx.app.log("Tetris", "created");
+
 		batch = new SpriteBatch();
 		font = new BitmapFont();
 		shapeRenderer = new ShapeRenderer();
 
-		prefs = Gdx.app.getPreferences("scores");
+		scores = Gdx.app.getPreferences("scores");
 		for(int i = 0; i < 10; i++)
-			if(!prefs.contains("highScore" + i))
-				prefs.putInteger("highScore" + i, 0);
-		prefs.flush();
+			if(!scores.contains(highScore + i))
+				scores.putInteger(highScore + i, 0);
+		scores.flush();
+
+		options = Gdx.app.getPreferences("options");
 
 		rows = 20;
 		columns = 10;
 		blocks = new Array<Block>(true, rows*columns);
 
-		this.setScreen(new MenuScreen(this));
+		setGarbageStart();
+
+		this.setScreen(new MainScreen(this));
 
 //		Gdx.graphics.setContinuousRendering(false);
 //		Gdx.graphics.requestRendering();
@@ -114,6 +145,14 @@ public class Tetris extends Game implements Iterable<Block>{
 		blocks.clear();
 		totalRowsCleared = 0;
 		moveTime = getMoveTime(totalRowsCleared);
+
+		RandomXS128 rand = new RandomXS128();
+		for(int i = 0; i < garbageStart; i++){
+			for(int j = 0; j < columns; j++){
+				if(rand.nextBoolean())
+					blocks.add(new Block(this, j, i));
+			}
+		}
 	}
 
 	/*
@@ -273,7 +312,7 @@ public class Tetris extends Game implements Iterable<Block>{
 	 * @param i		integer greater than or equal to 0
 	 */
 	public int getHighScore(int i){
-		return prefs.getInteger("highScore" + i);
+		return scores.getInteger(highScore + i);
 	}
 
 	/*
@@ -281,22 +320,22 @@ public class Tetris extends Game implements Iterable<Block>{
 	 */
 	private void setHighScore(){
 		// if current score less than lowest score on high scores table, do nothing
-		if(getScore() < prefs.getInteger("highScore" + 9))
+		if(getScore() < scores.getInteger(highScore + 9))
 			return;
 
 		for(int i = 9; i > 0; i--){
 			// copy (i-1)'th score to i'th score
-			prefs.putInteger("highScore" + i, prefs.getInteger("highScore" + (i-1)));
-			if(getScore() < prefs.getInteger("highScore" + i)) {
+			scores.putInteger(highScore + i, scores.getInteger(highScore + (i-1)));
+			if(getScore() < scores.getInteger(highScore + i)) {
 				// if current score less than (i-1)'th score
 				// set i'th score to current score
-				prefs.putInteger("highScore" + i, getScore());
-				prefs.flush();
+				scores.putInteger(highScore + i, getScore());
+				scores.flush();
 				return;
 			}
 		}
 
-		prefs.putInteger("highScore0", getScore());
-		prefs.flush();
+		scores.putInteger(highScore + "0", getScore());
+		scores.flush();
 	}
 }

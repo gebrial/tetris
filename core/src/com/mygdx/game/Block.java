@@ -25,6 +25,20 @@ class Block implements Comparable<Block>{
         color = c;
     }
 
+    /*
+     * Creates a block with a random color.
+     */
+    public Block(Tetris tetris, int column, int row) {
+        this(tetris, column, row, randColor(tetris));
+    }
+
+    /*
+     * Returns a random color from the set of colors used for pieces.
+     */
+    private static Color randColor(Tetris g){
+        return new Piece(g).getColor();
+    }
+
     public Color getColor() {
         return color;
     }

@@ -7,7 +7,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 
 /**
- * Created by Stephen on 4/2/2016.
+ * Created by sanjaya on 4/2/2016.
  */
 public class LossScreen implements Screen {
     final Tetris game;
@@ -46,7 +46,7 @@ public class LossScreen implements Screen {
         game.batch.end();
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)
                 || Gdx.input.isTouched()){
-            game.setScreen(new MenuScreen(game));
+            game.setScreen(new MainScreen(game));
             dispose();
         }
         if(Gdx.input.isKeyPressed(Input.Keys.Q))
