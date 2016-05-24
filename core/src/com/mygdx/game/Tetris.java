@@ -6,8 +6,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -60,14 +59,10 @@ public class Tetris extends Game implements Iterable<Block>{
 	}
 
 	/*
-	 * Initialize the value of the number of garbage lines from the options preferenes
-	 * or set it to zero if no such option has been created yet.
+	 * Initialize the value of the number of garbage lines from the options prefs
 	 */
 	void setGarbageStart(){
-		if(!options.contains(garbageLines))
-			setGarbageStart(0);
-		else
-			setGarbageStart(options.getInteger(garbageLines));
+		setGarbageStart(options.getInteger(garbageLines));
 	}
 
 	/*
@@ -98,6 +93,20 @@ public class Tetris extends Game implements Iterable<Block>{
 		font = new BitmapFont();
 		shapeRenderer = new ShapeRenderer();
 
+		rows = 20;
+		columns = 10;
+		blocks = new Array<Block>(true, rows*columns);
+
+		setupPrefs();
+		setGarbageStart();
+
+		this.setScreen(new MainScreen(this));
+
+//		Gdx.graphics.setContinuousRendering(false);
+//		Gdx.graphics.requestRendering();
+	}
+
+	private void setupPrefs(){
 		scores = Gdx.app.getPreferences("scores");
 		for(int i = 0; i < 10; i++)
 			if(!scores.contains(highScore + i))
@@ -105,17 +114,9 @@ public class Tetris extends Game implements Iterable<Block>{
 		scores.flush();
 
 		options = Gdx.app.getPreferences("options");
-
-		rows = 20;
-		columns = 10;
-		blocks = new Array<Block>(true, rows*columns);
-
-		setGarbageStart();
-
-		this.setScreen(new MainScreen(this));
-
-//		Gdx.graphics.setContinuousRendering(false);
-//		Gdx.graphics.requestRendering();
+		if(!options.contains(garbageLines))
+			setGarbageStart(0);
+		options.flush();
 	}
 
 	@Override
